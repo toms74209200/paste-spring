@@ -2,6 +2,7 @@ plugins {
 	java
 	id("org.springframework.boot") version "4.0.0"
 	id("io.spring.dependency-management") version "1.1.7"
+	id("org.openapi.generator") version "7.17.0"
 }
 
 group = "com.example"
@@ -33,4 +34,30 @@ dependencies {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+openApiGenerate {
+	generatorName = "spring"
+	inputSpec = "$rootDir/spec.yml"
+	outputDir = "$buildDir/generated"
+	apiPackage = "com.example.paste.api"
+	modelPackage = "com.example.paste.model"
+	configOptions = mapOf(
+		"delegatePattern" to "true",
+		"interfaceOnly" to "true",
+		"useSpringBoot3" to "true",
+		"useTags" to "true"
+	)
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir("$buildDir/generated/src/main/java")
+		}
+	}
+}
+
+tasks.named("compileJava") {
+	dependsOn("openApiGenerate")
 }
