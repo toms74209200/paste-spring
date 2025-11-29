@@ -1,0 +1,265 @@
+openapi: 3.0.3
+info:
+  title: Paste API
+  description: シンプルなテキスト共有API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: ローカル開発環境
+
+tags:
+  - name: create
+    description: テキスト投稿操作
+  - name: read
+    description: テキスト取得操作
+
+paths:
+  /pastes:
+    post:
+      tags:
+        - create
+      summary: テキストを投稿
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+                  description: 投稿するテキスト
+                  example: "console.log('Hello World');"
+                title:
+                  type: string
+                  description: タイトル（オプション）
+                  example: "My Code Snippet"
+                expires_in:
+                  type: integer
+                  description: 有効期限（秒）。未指定の場合は7日間
+                  example: 86400
+                  default: 604800
+                language:
+                  type: string
+                  description: シンタックスハイライト用の言語指定（オプション）
+                  example: "javascript"
+      responses:
+        '201':
+          description: 投稿成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - url
+                  - html_url
+                  - raw_url
+                  - json_url
+                  - created_at
+                  - expires_at
+                properties:
+                  id:
+                    type: string
+                    description: 投稿の一意な識別子
+                    example: "abc123"
+                  url:
+                    type: string
+                    description: 投稿へのアクセスURL（デフォルトHTML）
+                    example: "http://localhost:8080/pastes/abc123"
+                  html_url:
+                    type: string
+                    description: HTML表示用URL
+                    example: "http://localhost:8080/pastes/abc123.html"
+                  raw_url:
+                    type: string
+                    description: プレーンテキスト取得用URL
+                    example: "http://localhost:8080/pastes/abc123/raw"
+                  json_url:
+                    type: string
+                    description: JSON取得用URL
+                    example: "http://localhost:8080/pastes/abc123.json"
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: 作成日時
+                    example: "2025-11-29T10:30:00Z"
+                  expires_at:
+                    type: string
+                    format: date-time
+                    description: 有効期限
+                    example: "2025-12-06T10:30:00Z"
+        '400':
+          description: リクエストが不正
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
+                    example: "content is required"
+
+  /pastes/{id}:
+    get:
+      tags:
+        - read
+      summary: 投稿を取得（HTML表示・デフォルト）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 投稿ID
+          example: "abc123"
+      responses:
+        '200':
+          description: 投稿が見つかった
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: 投稿が見つからない、または期限切れ
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
+                    example: "Paste not found"
+
+  /pastes/{id}.html:
+    get:
+      tags:
+        - read
+      summary: 投稿を取得（HTML表示）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 投稿ID
+          example: "abc123"
+      responses:
+        '200':
+          description: 投稿が見つかった
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: 投稿が見つからない、または期限切れ
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
+                    example: "Paste not found"
+
+  /pastes/{id}/raw:
+    get:
+      tags:
+        - read
+      summary: 投稿を取得（プレーンテキスト）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 投稿ID
+          example: "abc123"
+      responses:
+        '200':
+          description: 投稿が見つかった
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: 投稿が見つからない、または期限切れ
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
+                    example: "Paste not found"
+
+  /pastes/{id}.json:
+    get:
+      tags:
+        - read
+      summary: 投稿を取得（JSON形式）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 投稿ID
+          example: "abc123"
+      responses:
+        '200':
+          description: 投稿が見つかった
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - content
+                  - created_at
+                  - expires_at
+                properties:
+                  id:
+                    type: string
+                    example: "abc123"
+                  content:
+                    type: string
+                    example: "console.log('Hello World');"
+                  title:
+                    type: string
+                    nullable: true
+                    example: "My Code Snippet"
+                  language:
+                    type: string
+                    nullable: true
+                    example: "javascript"
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2025-11-29T10:30:00Z"
+                  expires_at:
+                    type: string
+                    format: date-time
+                    example: "2025-12-06T10:30:00Z"
+        '404':
+          description: 投稿が見つからない、または期限切れ
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
+                    example: "Paste not found"
