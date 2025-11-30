@@ -14,8 +14,10 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
       - uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: false
       - name: Build
-        run: ./gradlew build --no-daemon -x test
+        run: ./gradlew compileJava --no-daemon
       - uses: actions/cache/save@v4
         with:
           path: build/
