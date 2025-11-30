@@ -20,6 +20,33 @@ repositories {
 	mavenCentral()
 }
 
+sourceSets {
+	main {
+		java {
+			srcDir("$buildDir/generated/src/main/java")
+		}
+	}
+	create("integrationTest") {
+		java {
+			srcDir("src/integration-test/java")
+		}
+		resources {
+			srcDir("src/integration-test/resources")
+		}
+		compileClasspath += sourceSets.main.get().output
+		runtimeClasspath += sourceSets.main.get().output
+	}
+}
+
+configurations {
+	getByName("integrationTestImplementation") {
+		extendsFrom(configurations.testImplementation.get())
+	}
+	getByName("integrationTestRuntimeOnly") {
+		extendsFrom(configurations.testRuntimeOnly.get())
+	}
+}
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -31,11 +58,40 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+	testImplementation("net.jqwik:jqwik:1.9.3")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+	testLogging {
+		events("passed", "skipped", "failed", "standardOut", "standardError")
+		exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+		showExceptions = true
+		showCauses = true
+		showStackTraces = true
+		showStandardStreams = true
+	}
+}
+
+tasks.register<Test>("integrationTest") {
+	description = "Runs integration tests."
+	group = "verification"
+	testClassesDirs = sourceSets["integrationTest"].output.classesDirs
+	classpath = sourceSets["integrationTest"].runtimeClasspath
+	shouldRunAfter("test")
+	testLogging {
+		events("passed", "skipped", "failed", "standardOut", "standardError")
+		exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+		showExceptions = true
+		showCauses = true
+		showStackTraces = true
+		showStandardStreams = true
+	}
+}
+
+tasks.named("check") {
+	dependsOn("integrationTest")
 }
 
 openApiGenerate {
@@ -50,14 +106,6 @@ openApiGenerate {
 		"useSpringBoot3" to "true",
 		"useTags" to "true"
 	)
-}
-
-sourceSets {
-	main {
-		java {
-			srcDir("$buildDir/generated/src/main/java")
-		}
-	}
 }
 
 tasks.named("compileJava") {
