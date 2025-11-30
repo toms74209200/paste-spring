@@ -24,6 +24,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
+	implementation("org.openapitools:jackson-databind-nullable:0.2.8")
 	implementation("org.xerial:sqlite-jdbc:3.47.2.0")
 	implementation("org.hibernate.orm:hibernate-community-dialects:7.0.0.Final")
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")

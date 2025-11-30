@@ -1,0 +1,22 @@
+name: On Pull Request - Java
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '**.java'
+      - '**.kts'
+      - '.github/workflows/on-pullrequest-java.yml'
+
+jobs:
+  build:
+    uses: ./.github/workflows/job-build-java.yml
+  test-small:
+    needs:
+      - build
+    uses: ./.github/workflows/job-test-small-java.yml
+  test-medium:
+    needs:
+      - build
+    uses: ./.github/workflows/job-test-medium-java.yml
