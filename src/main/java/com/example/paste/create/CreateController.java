@@ -4,8 +4,12 @@ import com.example.paste.api.CreateApi;
 import com.example.paste.create.exceptions.InvalidInputException;
 import com.example.paste.model.PastesPost201Response;
 import com.example.paste.model.PastesPostRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +21,8 @@ public class CreateController implements CreateApi {
   public CreateController(CreateService createService) {
     this.createService = createService;
   }
+
+  private final Logger logger = LoggerFactory.getLogger(CreateController.class);
 
   @Override
   public ResponseEntity<PastesPost201Response> pastesPost(PastesPostRequest request) {
@@ -38,13 +44,19 @@ public class CreateController implements CreateApi {
     };
   }
 
-  @ExceptionHandler(InvalidInputException.class)
-  public ResponseEntity<Void> handleInvalidInputException(InvalidInputException e) {
+  @ExceptionHandler({
+    InvalidInputException.class,
+    HttpMessageNotReadableException.class,
+    MethodArgumentNotValidException.class
+  })
+  public ResponseEntity<Void> handleBadRequest(Exception e) {
+    logger.info("Invalid request", e);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Void> handleException(Exception e) {
+    logger.warn("An unexpected error occurred", e);
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
   }
 }
