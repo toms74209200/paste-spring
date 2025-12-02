@@ -7,6 +7,7 @@ import com.example.paste.create.exceptions.SystemErrorException;
 import com.example.paste.create.models.PasteContent;
 import com.example.paste.create.models.PasteUrls;
 import com.example.paste.model.PastesPostRequest;
+import io.opentelemetry.instrumentation.annotations.WithSpan;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class CreateService {
     this.baseUrl = config.getBaseUrl();
   }
 
+  @WithSpan
   public CreateResult create(PastesPostRequest request) {
     Optional<PasteContent> contentOpt =
         PasteContent.parse(
