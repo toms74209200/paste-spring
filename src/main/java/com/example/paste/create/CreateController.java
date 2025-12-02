@@ -2,8 +2,8 @@ package com.example.paste.create;
 
 import com.example.paste.api.CreateApi;
 import com.example.paste.create.exceptions.InvalidInputException;
-import com.example.paste.model.PastesPost201Response;
-import com.example.paste.model.PastesPostRequest;
+import com.example.paste.model.PostPastes201Response;
+import com.example.paste.model.PostPastesRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -25,14 +25,14 @@ public class CreateController implements CreateApi {
   private final Logger logger = LoggerFactory.getLogger(CreateController.class);
 
   @Override
-  public ResponseEntity<PastesPost201Response> pastesPost(PastesPostRequest request) {
+  public ResponseEntity<PostPastes201Response> postPastes(PostPastesRequest request) {
     CreateResult result = createService.create(request);
 
     return switch (result) {
       case CreateResult.Success success ->
           ResponseEntity.status(201)
               .body(
-                  new PastesPost201Response(
+                  new PostPastes201Response(
                       success.value().id(),
                       success.value().urls().url().toString(),
                       success.value().urls().htmlUrl().toString(),

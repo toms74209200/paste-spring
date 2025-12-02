@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.example.paste.create.data.PasteCreated;
 import com.example.paste.create.data.PasteCreatedRepository;
 import com.example.paste.create.exceptions.InvalidInputException;
-import com.example.paste.model.PastesPostRequest;
+import com.example.paste.model.PostPastesRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +25,7 @@ class CreateServiceIntegrationTest {
     String expectedTitle = "My Code Snippet";
     String expectedLanguage = "javascript";
 
-    PastesPostRequest request = new PastesPostRequest();
+    PostPastesRequest request = new PostPastesRequest();
     request.setContent(expectedContent);
     request.setTitle(expectedTitle);
     request.setExpiresIn(86400);
@@ -61,7 +61,7 @@ class CreateServiceIntegrationTest {
   void createWithMinimalRequestThenSavesToDatabase() {
     String expectedContent = "Test content";
 
-    PastesPostRequest request = new PastesPostRequest();
+    PostPastesRequest request = new PostPastesRequest();
     request.setContent(expectedContent);
     request.setExpiresIn(3600);
     CreateResult result = createService.create(request);
@@ -80,7 +80,7 @@ class CreateServiceIntegrationTest {
 
   @Test
   void createWithInvalidContentThenReturnsFailure() {
-    PastesPostRequest request = new PastesPostRequest();
+    PostPastesRequest request = new PostPastesRequest();
     request.setContent("");
     request.setExpiresIn(3600);
 
@@ -93,7 +93,7 @@ class CreateServiceIntegrationTest {
 
   @Test
   void createWithNullExpiresInThenReturnsFailure() {
-    PastesPostRequest request = new PastesPostRequest();
+    PostPastesRequest request = new PostPastesRequest();
     request.setContent("content");
     request.setExpiresIn(null);
 
@@ -106,11 +106,11 @@ class CreateServiceIntegrationTest {
 
   @Test
   void createMultipleTimesThenGeneratesUniqueIds() {
-    PastesPostRequest request1 = new PastesPostRequest();
+    PostPastesRequest request1 = new PostPastesRequest();
     request1.setContent("First paste");
     request1.setExpiresIn(3600);
 
-    PastesPostRequest request2 = new PastesPostRequest();
+    PostPastesRequest request2 = new PostPastesRequest();
     request2.setContent("Second paste");
     request2.setExpiresIn(3600);
 

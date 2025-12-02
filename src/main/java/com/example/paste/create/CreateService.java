@@ -6,7 +6,7 @@ import com.example.paste.create.exceptions.InvalidInputException;
 import com.example.paste.create.exceptions.SystemErrorException;
 import com.example.paste.create.models.PasteContent;
 import com.example.paste.create.models.PasteUrls;
-import com.example.paste.model.PastesPostRequest;
+import com.example.paste.model.PostPastesRequest;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import java.net.URI;
 import java.time.Instant;
@@ -29,7 +29,7 @@ public class CreateService {
   }
 
   @WithSpan
-  public CreateResult create(PastesPostRequest request) {
+  public CreateResult create(PostPastesRequest request) {
     Optional<PasteContent> contentOpt =
         PasteContent.parse(
             request.getContent(),
