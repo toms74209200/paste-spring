@@ -40,3 +40,4 @@ CLAUDE.md
 .claude/
 
 *.db
+*.jqwik-database
