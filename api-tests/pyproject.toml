@@ -1,0 +1,36 @@
+[project]
+name = "paste-api-tests"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "pytest>=9.0.1",
+    "requests>=2.32.5",
+]
+
+[dependency-groups]
+dev = [
+    "openapi-python-client>=0.27.1",
+    "ruff>=0.14.7",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+exclude = [
+    ".venv",
+    "openapi_gen",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
