@@ -1,0 +1,16 @@
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/java:1-21-bullseye
+    volumes:
+      - ./:/workspaces/paste-spring:cached
+    working_dir: /workspaces/paste-spring
+    command: bash -c "while sleep 1000; do :; done"
+
+  jaeger:
+    image: jaegertracing/jaeger
+    ports:
+      - "16686:16686"
+      - "4318:4318"
+      - "4317:4317"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
