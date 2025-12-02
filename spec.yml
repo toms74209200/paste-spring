@@ -16,6 +16,7 @@ tags:
 paths:
   /pastes:
     post:
+      operationId: postPastes
       tags:
         - create
       summary: テキストを投稿
@@ -106,6 +107,7 @@ paths:
 
   /pastes/{id}:
     get:
+      operationId: getPasteById
       tags:
         - read
       summary: 投稿を取得（HTML表示・デフォルト）
@@ -139,6 +141,7 @@ paths:
 
   /pastes/{id}.html:
     get:
+      operationId: getPasteByIdHtml
       tags:
         - read
       summary: 投稿を取得（HTML表示）
@@ -172,6 +175,7 @@ paths:
 
   /pastes/{id}/raw:
     get:
+      operationId: getPasteByIdRaw
       tags:
         - read
       summary: 投稿を取得（プレーンテキスト）
@@ -205,6 +209,7 @@ paths:
 
   /pastes/{id}.json:
     get:
+      operationId: getPasteByIdJson
       tags:
         - read
       summary: 投稿を取得（JSON形式）
