@@ -1,0 +1,72 @@
+package com.example.paste.read;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.example.paste.create.data.PasteCreated;
+import com.example.paste.create.data.PasteCreatedRepository;
+import com.example.paste.read.exceptions.NotFoundException;
+import java.time.LocalDateTime;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+@SpringBootTest
+@Transactional
+class ReadServiceIntegrationTest {
+
+  @Autowired private ReadService readService;
+
+  @Autowired private PasteCreatedRepository repository;
+
+  @Test
+  void readAsJsonWithExistingPasteThenReturnsSuccess() {
+    String pasteId = RandomStringUtils.insecure().nextAlphanumeric(10);
+    String content = RandomStringUtils.insecure().nextAlphanumeric(10);
+    LocalDateTime createdAt = LocalDateTime.now();
+    LocalDateTime expiresAt = createdAt.plusHours(1);
+
+    PasteCreated paste = new PasteCreated(pasteId, content, null, null, createdAt, expiresAt);
+    repository.save(paste);
+
+    ReadJsonResult result = readService.readAsJson(pasteId);
+
+    assertThat(result).isInstanceOf(ReadJsonResult.Success.class);
+    ReadJsonResult.Success success = (ReadJsonResult.Success) result;
+    assertThat(success.value().getId()).isEqualTo(pasteId);
+    assertThat(success.value().getContent()).isEqualTo(content);
+    assertThat(success.value().getTitle().isPresent()).isFalse();
+    assertThat(success.value().getLanguage().isPresent()).isFalse();
+  }
+
+  @Test
+  void readAsRawMultipleTimesThenReturnsConsistentResults() {
+    String pasteId = RandomStringUtils.insecure().nextAlphanumeric(10);
+    String content = RandomStringUtils.insecure().nextAlphanumeric(10);
+    LocalDateTime createdAt = LocalDateTime.now();
+    LocalDateTime expiresAt = createdAt.plusDays(7);
+
+    PasteCreated paste =
+        new PasteCreated(
+            pasteId,
+            content,
+            RandomStringUtils.insecure().nextAlphanumeric(10),
+            "python",
+            createdAt,
+            expiresAt);
+    repository.save(paste);
+
+    ReadRawResult result1 = readService.readAsRaw(pasteId);
+    ReadRawResult result2 = readService.readAsRaw(pasteId);
+
+    assertThat(result1).isInstanceOf(ReadRawResult.Success.class);
+    assertThat(result2).isInstanceOf(ReadRawResult.Success.class);
+
+    String content1 = ((ReadRawResult.Success) result1).value();
+    String content2 = ((ReadRawResult.Success) result2).value();
+
+    assertThat(content1).isEqualTo(content2);
+    assertThat(content1).isEqualTo(content);
+  }
+}
