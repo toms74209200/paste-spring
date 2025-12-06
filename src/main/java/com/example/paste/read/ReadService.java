@@ -2,7 +2,11 @@ package com.example.paste.read;
 
 import com.example.paste.create.data.PasteCreatedRepository;
 import com.example.paste.model.GetPasteByIdJson200Response;
+import com.example.paste.read.data.HtmlTemplateLoader;
 import com.example.paste.read.exceptions.NotFoundException;
+import com.example.paste.read.models.HtmlRenderer;
+import com.example.paste.read.models.HtmlSafePaste;
+import com.example.paste.read.models.PasteHtmlSanitizer;
 import com.example.paste.read.models.ValidatedPaste;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import java.time.Instant;
@@ -16,6 +20,19 @@ public class ReadService {
 
   public ReadService(PasteCreatedRepository pasteCreatedRepository) {
     this.pasteCreatedRepository = pasteCreatedRepository;
+  }
+
+  @WithSpan
+  public ReadHtmlResult readAsHtml(String id) {
+    return ValidatedPaste.from(pasteCreatedRepository.findById(id), Instant.now())
+        .<ReadHtmlResult>map(
+            paste -> {
+              HtmlSafePaste safePaste = PasteHtmlSanitizer.sanitize(paste);
+              String template = HtmlTemplateLoader.getPasteTemplate();
+              String html = HtmlRenderer.render(template, safePaste);
+              return new ReadHtmlResult.Success(html);
+            })
+        .orElse(new ReadHtmlResult.Failure(new NotFoundException("Paste not found")));
   }
 
   @WithSpan
