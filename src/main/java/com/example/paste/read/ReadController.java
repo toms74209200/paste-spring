@@ -23,12 +23,24 @@ public class ReadController implements ReadApi {
 
   @Override
   public ResponseEntity<String> getPasteById(String id) {
-    throw new RuntimeException("Not implemented yet");
+    ReadHtmlResult result = readService.readAsHtml(id);
+
+    return switch (result) {
+      case ReadHtmlResult.Success success ->
+          ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(success.value());
+      case ReadHtmlResult.Failure failure -> throw failure.exception();
+    };
   }
 
   @Override
   public ResponseEntity<String> getPasteByIdHtml(String id) {
-    throw new RuntimeException("Not implemented yet");
+    ReadHtmlResult result = readService.readAsHtml(id);
+
+    return switch (result) {
+      case ReadHtmlResult.Success success ->
+          ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(success.value());
+      case ReadHtmlResult.Failure failure -> throw failure.exception();
+    };
   }
 
   @Override

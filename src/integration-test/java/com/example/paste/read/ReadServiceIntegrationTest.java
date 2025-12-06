@@ -21,6 +21,55 @@ class ReadServiceIntegrationTest {
   @Autowired private PasteCreatedRepository repository;
 
   @Test
+  void readAsHtmlWithExistingPasteThenReturnsSuccess() {
+    String pasteId = RandomStringUtils.insecure().nextAlphanumeric(10);
+    String content = RandomStringUtils.insecure().nextAlphanumeric(10);
+    String title = RandomStringUtils.insecure().nextAlphanumeric(10);
+    String language = "java";
+    LocalDateTime createdAt = LocalDateTime.now();
+    LocalDateTime expiresAt = createdAt.plusDays(1);
+
+    repository.save(new PasteCreated(pasteId, content, title, language, createdAt, expiresAt));
+
+    ReadHtmlResult result = readService.readAsHtml(pasteId);
+
+    assertThat(result).isInstanceOf(ReadHtmlResult.Success.class);
+    ReadHtmlResult.Success success = (ReadHtmlResult.Success) result;
+    assertThat(success.value()).contains(content);
+    assertThat(success.value()).contains(title);
+  }
+
+  @Test
+  void readAsHtmlWithNonExistentPasteThenReturnsFailure() {
+    String nonExistentId = RandomStringUtils.insecure().nextAlphanumeric(10);
+
+    ReadHtmlResult result = readService.readAsHtml(nonExistentId);
+
+    assertThat(result).isInstanceOf(ReadHtmlResult.Failure.class);
+    ReadHtmlResult.Failure failure = (ReadHtmlResult.Failure) result;
+    assertThat(failure.exception()).isInstanceOf(NotFoundException.class);
+    assertThat(failure.exception().getMessage()).isEqualTo("Paste not found");
+  }
+
+  @Test
+  void readAsHtmlWithExpiredPasteThenReturnsFailure() {
+    String pasteId = RandomStringUtils.insecure().nextAlphanumeric(10);
+    String content = RandomStringUtils.insecure().nextAlphanumeric(10);
+    LocalDateTime createdAt = LocalDateTime.now().minusDays(2);
+    LocalDateTime expiresAt = LocalDateTime.now().minusDays(1);
+
+    PasteCreated paste = new PasteCreated(pasteId, content, null, null, createdAt, expiresAt);
+    repository.save(paste);
+
+    ReadHtmlResult result = readService.readAsHtml(pasteId);
+
+    assertThat(result).isInstanceOf(ReadHtmlResult.Failure.class);
+    ReadHtmlResult.Failure failure = (ReadHtmlResult.Failure) result;
+    assertThat(failure.exception()).isInstanceOf(NotFoundException.class);
+    assertThat(failure.exception().getMessage()).isEqualTo("Paste not found");
+  }
+
+  @Test
   void readAsJsonWithExistingPasteThenReturnsSuccess() {
     String pasteId = RandomStringUtils.insecure().nextAlphanumeric(10);
     String content = RandomStringUtils.insecure().nextAlphanumeric(10);
