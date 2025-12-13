@@ -14,7 +14,7 @@ uv sync
 Generate client code from OpenAPI spec.
 
 ```bash
-uv run openapi-python-client generate --path ../spec.yml  --output-path openapi_gen --overwrite
+uv run openapi-python-client generate --path ../spec.yml --output-path openapi_gen --overwrite
 ```
 
 ## Usage
