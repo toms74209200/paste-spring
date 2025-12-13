@@ -45,6 +45,8 @@
             font-size: 14px;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -57,7 +59,8 @@
                 <span> | Expires: {{expiresAt}}</span>
             </div>
         </div>
-        <pre><code>{{content}}</code></pre>
+        <pre><code class="language-{{languageMeta}}">{{content}}</code></pre>
     </div>
+    <script>hljs.highlightAll();</script>
 </body>
 </html>
